@@ -10,7 +10,7 @@ namespace BlogAPI.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
-        private readonly string ConnectionString = "Server=localhost;Database=blog;User Id=root;Password=;";
+        private readonly string ConnectionString = "Server=localhost;Database=blog;uid=root;Password=;";
         [HttpGet]
         public List<blogger> GetAllBloggers() {
             var connector = new MySqlConnection(ConnectionString);
@@ -39,16 +39,16 @@ namespace BlogAPI.Controllers
             return null;
         }
         [HttpPost]
-        public  object NewBlogger(AddBloggerDTO blogger)
+        public  object NewBlogger(AddBloggerDTO Blg)
         {
             var connector = new MySqlConnection(ConnectionString);
             connector.Open();
             var blg = new blogger
             {
-                Name = blogger.Name,
-                Email = blogger.Email,
-                Age = blogger.Age,
-                Password = blogger.Password,
+                Name = Blg.Name,
+                Email = Blg.Email,
+                Age = Blg.Age,
+                Password = Blg.Password,
                 RegistrationTime = DateTime.Now
             };
 
@@ -65,17 +65,28 @@ namespace BlogAPI.Controllers
 
             connector.Close();
 
-            return blg;
+            return Blg;
         }
         [HttpPut]
         public object updateBlogger(int id, blogger blogger)
         {
-            return null;
+            var connector = new MySqlConnection(ConnectionString);
+            connector.Open();
+
+            connector.Close();
+            return blogger;
         }
         [HttpDelete]
         public object deleteBlogger(int id) {
 
-            return null;
+            var connector = new MySqlConnection(ConnectionString); connector.Open();
+
+            var sql = $"DELETE FROM bloggers WHERE Id=@Id";
+            var cmd = new MySqlCommand(sql, connector);
+            cmd.Parameters.AddWithValue("@Id", id);
+            cmd.ExecuteNonQuery();
+            connector.Close();
+            return new { message = "Blogger deleted successfully" };
         }
     }
 }

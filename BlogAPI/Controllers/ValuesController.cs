@@ -1,4 +1,5 @@
 ﻿using BlogAPI.models;
+using BlogAPI.models.DTIOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MySqlConnector;
@@ -9,7 +10,7 @@ namespace BlogAPI.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
-        private readonly string ConnectionString = "Server=localhost;Database=blogdb;User Id=root;Password=;";
+        private readonly string ConnectionString = "Server=localhost;Database=blog;User Id=root;Password=;";
         [HttpGet]
         public List<blogger> GetAllBloggers() {
             var connector = new MySqlConnection(ConnectionString);
@@ -38,7 +39,7 @@ namespace BlogAPI.Controllers
             return null;
         }
         [HttpPost]
-        public  object NewBlogger(blogger blogger)
+        public  object NewBlogger(AddBloggerDTO blogger)
         {
             var connector = new MySqlConnection(ConnectionString);
             connector.Open();

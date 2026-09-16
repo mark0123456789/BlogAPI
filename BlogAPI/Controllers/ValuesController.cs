@@ -107,5 +107,65 @@ namespace BlogAPI.Controllers
             connector.Close();
             return new { message = "Blogger deleted successfully" };
         }
+        [HttpGet("ById")]
+        public object GetBloggerById(int id)
+        {
+            var connector = new MySqlConnection(ConnectionString);
+            connector.Open();
+            string sql = $"SELECT Name, Email FROM blogger WHERE Id=@Id";
+            var cmd = new MySqlCommand(sql, connector);
+            cmd.Parameters.AddWithValue("@Id", id);
+            var dataReader = cmd.ExecuteReader();
+            dataReader.Read();
+            var blogger = new 
+                {
+                    Name = dataReader.GetString(0),
+                    Email = dataReader.GetString(1),
+                };
+
+            connector.Close();
+            return blogger;
+        }
+        [HttpGet("Bybloggerownpost")]
+        public object GetBloggerOwnPosts(int id)
+        {
+            var OwnPosts = new List<object>();
+            var connector = new MySqlConnection(ConnectionString);
+            connector.Open();
+            string sql = $"SELECT blogger.Name, blogpost.title,blogpost.content\r\nFROM `blogger`\r\nINNER JOIN blogpost ON blogger.Id = blogpost.BlogId\r\nWHERE blogger.Id = @Id";
+            var cmd = new MySqlCommand(sql, connector);
+            cmd.Parameters.AddWithValue("@Id", id);
+            var dataReader = cmd.ExecuteReader();
+            while (dataReader.Read()) { 
+            var BloggerOwnPosts = new
+            {
+                Name = dataReader.GetString(0),
+                title = dataReader.GetString(1),
+                Content = dataReader.GetString(2)
+            };
+                OwnPosts.Add(BloggerOwnPosts);
+            }
+            connector.Close();
+            return OwnPosts;
+        }
+
+        [HttpGet("NumberOfposts")]
+        public object GetNumberOfPosts(int id)
+        {
+            var connector = new MySqlConnection(ConnectionString);
+            connector.Open();
+            string sql = $"SELECT COUNT(blogpost.Id) FROM `blogger` INNER JOIN blogpost ON blogger.Id = blogpost.BlogId WHERE blogger.Id = @Id";
+            var cmd = new MySqlCommand(sql, connector);
+            cmd.Parameters.AddWithValue("@Id", id);
+            var dataReader = cmd.ExecuteReader();
+            dataReader.Read();
+            var NumberOfPosts = new
+            {
+                Count = dataReader.GetInt32(0)
+            };
+            connector.Close();
+            return NumberOfPosts;
+        }
+
     }
 }

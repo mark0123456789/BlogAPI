@@ -8,45 +8,47 @@ namespace BlogAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BlogPost : ControllerBase
+    public class BlogPostsController : ControllerBase       
     {
         private readonly string ConnectionString = "Server=localhost;Database=blog;uid=root;Password=;";
+
         [HttpGet]
-        public List<BlogPost> GetAllBloggersPosts() 
+        public List<models.BlogPost> GetAllBloggersPosts()
         {
             var connector = new MySqlConnection(ConnectionString);
             connector.Open();
-
             string sql = "SELECT * FROM blogpost";
             var cmd = new MySqlCommand(sql, connector);
             var dataReader = cmd.ExecuteReader();
+
+            var results = new List<models.BlogPost>();
             while (dataReader.Read())
             {
-                var bloggerpost = new blogger
+                var post = new models.BlogPost
                 {
                     Id = dataReader.GetInt32(0),
-                    Name = dataReader.GetString(1),
-                    Email = dataReader.GetString(2),
-                    Age = dataReader.GetInt32(3),
-                    Password = dataReader.GetString(4),
-                    RegistrationTime = dataReader.GetDateTime(5)
+                    Title =  dataReader.GetString(1),
+                    Content = dataReader.GetString(2),
+                    PostTime =  dataReader.GetDateTime(3),
+                    BlogId =dataReader.GetInt32(4)
                 };
+                results.Add(post);
             }
 
             connector.Close();
-            return null;
+            return results;
         }
         [HttpPost]
         public object NewBloggersPosts(AddBloggerPostDTO BlgPST) 
         {
             var connector = new MySqlConnection(ConnectionString);
             connector.Open();
-            var blgPST = new BlogPost
+            var blgPST = new models.BlogPost
             {
                 Title= BlgPST.title,
                 Content = BlgPST.content,
                 PostTime = DateTime.Now,
-                BlogId = BlgPST.BlogId
+                BlogId = BlgPST.BlogId 
             };
 
             var sql = $" INSERT INTO `blogpost`(`title`, `content`, `PostTime`,`BlogId`) VALUES (@title, @content, @PostTime, @BlogId)";
@@ -64,22 +66,46 @@ namespace BlogAPI.Controllers
             return BlgPST;
         }
         [HttpPut]
-        public object updateBloggersPosts(int id, UpdateBloggerDTO updateBloggerDTO) 
+        public object UpdateBlogPost(int id, UpdateBloggerPostsDTO dto)
         {
             var connector = new MySqlConnection(ConnectionString);
             connector.Open();
 
+            var sql = "UPDATE blogpost SET title=@title, content=@content, BlogId=@BlogId WHERE id=@Id";
+            var cmd = new MySqlCommand(sql, connector);
+            cmd.Parameters.AddWithValue("@Id", id);
+            cmd.Parameters.AddWithValue("@title", dto.title);
+            cmd.Parameters.AddWithValue("@content", dto.content );
+            cmd.Parameters.AddWithValue("@BlogId", dto.BlogId);
+
+            cmd.ExecuteNonQuery();
+
             connector.Close();
-            return null;
+
+            return new models.BlogPost
+            {
+                Id = id,
+                Title = dto.title,
+                Content = dto.content,
+                PostTime = DateTime.Now,
+                BlogId = dto.BlogId ?? 0
+            };
         }
+
         [HttpDelete]
-        public object deleteBloggersPosts(int id)
+        public object DeleteBlogPost(int id)
         {
             var connector = new MySqlConnection(ConnectionString);
             connector.Open();
 
+            var sql = "DELETE FROM blogpost WHERE id=@Id";
+            var cmd = new MySqlCommand(sql, connector);
+            cmd.Parameters.AddWithValue("@Id", id);
+            cmd.ExecuteNonQuery();
+
             connector.Close();
-            return null;
+            return new { message = "Blog post deleted successfully" };
         }
+        
     }
 }

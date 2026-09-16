@@ -17,6 +17,7 @@ namespace BlogAPI.Controllers
         {
             var connector = new MySqlConnection(ConnectionString);
             connector.Open();
+           
             string sql = "SELECT * FROM blogpost";
             var cmd = new MySqlCommand(sql, connector);
             var dataReader = cmd.ExecuteReader();
@@ -27,10 +28,11 @@ namespace BlogAPI.Controllers
                 var post = new models.BlogPost
                 {
                     Id = dataReader.GetInt32(0),
-                    Title =  dataReader.GetString(1),
+                    Title = dataReader.GetString(1),
                     Content = dataReader.GetString(2),
-                    PostTime =  dataReader.GetDateTime(3),
-                    BlogId =dataReader.GetInt32(4)
+                    PostTime = dataReader.GetDateTime(3),
+                    UpdateTime = dataReader.GetDateTime(4),
+                    BlogId = dataReader.GetInt32(5)
                 };
                 results.Add(post);
             }
@@ -72,12 +74,14 @@ namespace BlogAPI.Controllers
             var connector = new MySqlConnection(ConnectionString);
             connector.Open();
 
-            var sql = "UPDATE blogpost SET title=@title, content=@content, BlogId=@BlogId WHERE id=@Id";
+            var sql = "UPDATE blogpost SET title=@title, content=@content, BlogId=@BlogId, UpdateTime=@UpdateTime WHERE id=@Id";
             var cmd = new MySqlCommand(sql, connector);
             cmd.Parameters.AddWithValue("@Id", id);
             cmd.Parameters.AddWithValue("@title", dto.title);
-            cmd.Parameters.AddWithValue("@content", dto.content );
-            cmd.Parameters.AddWithValue("@BlogId", dto.BlogId);
+            cmd.Parameters.AddWithValue("@content",dto.content);
+            cmd.Parameters.AddWithValue("@BlogId", dto.BlogId ?? 0);
+            var updatedTime = DateTime.Now;
+            cmd.Parameters.AddWithValue("@UpdateTime", updatedTime);
 
             cmd.ExecuteNonQuery();
 

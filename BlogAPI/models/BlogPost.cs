@@ -9,6 +9,6 @@ namespace BlogAPI.models
         public string? Content { get; set; }
         public DateTime? PostTime { get; set; }
         public DateTime? UpdateTime { get; set; }
-        public int BlogId { get; set; }
+        public int? BlogId { get; set; }
     }
 }

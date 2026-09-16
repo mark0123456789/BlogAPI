@@ -16,7 +16,7 @@ namespace BlogAPI.Controllers
             var connector = new MySqlConnection(ConnectionString);
             connector.Open();
 
-            string sql = "SELECT * FROM bloggers";
+            string sql = "SELECT * FROM blogger";
 
             var cmd = new MySqlCommand(sql, connector);
             var dataReader = cmd.ExecuteReader();
@@ -52,7 +52,7 @@ namespace BlogAPI.Controllers
                 RegistrationTime = DateTime.Now
             };
 
-            var sql = $" INSERT INTO bloggers (Name, Email, Age, Password, RegistrationTime) VALUES (@Name, @Email, @Age, @Password, @RegistrationTime)";
+            var sql = $" INSERT INTO blogger (Name, Email, Age, Password, RegistrationTime) VALUES (@Name, @Email, @Age, @Password, @RegistrationTime)";
 
              var cmd = new MySqlCommand(sql, connector);
              cmd.Parameters.AddWithValue("@Name", blg.Name);
@@ -68,20 +68,39 @@ namespace BlogAPI.Controllers
             return Blg;
         }
         [HttpPut]
-        public object updateBlogger(int id, blogger blogger)
+        public object updateBlogger(int id, UpdateBloggerDTO updateBloggerDTO)
         {
             var connector = new MySqlConnection(ConnectionString);
             connector.Open();
 
+            string sql = $"UPDATE blogger SET Name=@Name, Email=@Email, Age=@Age, Password=@Password WHERE Id=@Id";
+
+            var cmd = new MySqlCommand(sql, connector);
+            cmd.Parameters.AddWithValue("@Id", id);
+            cmd.Parameters.AddWithValue("@Name", updateBloggerDTO.Name);
+            cmd.Parameters.AddWithValue("@Email", updateBloggerDTO.Email);
+            cmd.Parameters.AddWithValue("@Age", updateBloggerDTO.Age);
+            cmd.Parameters.AddWithValue("@Password", updateBloggerDTO.Password);
+
+            cmd.ExecuteNonQuery();
+
+            var updatedBlogger = new blogger
+            {
+                Id = id,
+                Name = updateBloggerDTO.Name,
+                Email = updateBloggerDTO.Email,
+                Age = updateBloggerDTO.Age,
+                Password = updateBloggerDTO.Password
+            };
             connector.Close();
-            return blogger;
+            return updatedBlogger;
         }
         [HttpDelete]
         public object deleteBlogger(int id) {
 
             var connector = new MySqlConnection(ConnectionString); connector.Open();
 
-            var sql = $"DELETE FROM bloggers WHERE Id=@Id";
+            var sql = $"DELETE FROM blogger WHERE Id=@Id";
             var cmd = new MySqlCommand(sql, connector);
             cmd.Parameters.AddWithValue("@Id", id);
             cmd.ExecuteNonQuery();

@@ -51,13 +51,14 @@ namespace BlogAPI.Controllers
                 BlogId = BlgPST.BlogId 
             };
 
-            var sql = $" INSERT INTO `blogpost`(`title`, `content`, `PostTime`,`BlogId`) VALUES (@title, @content, @PostTime, @BlogId)";
+            var sql = $" INSERT INTO `blogpost`(`title`, `content`, `PostTime`,`UpdateTime`,`BlogId`) VALUES (@title, @content, @PostTime, @UpdateTime, @BlogId)";
 
             var cmd = new MySqlCommand(sql, connector);
             cmd.Parameters.AddWithValue("@title", blgPST.Title);
             cmd.Parameters.AddWithValue("@content", blgPST.Content);
             cmd.Parameters.AddWithValue("@PostTime", blgPST.PostTime);
             cmd.Parameters.AddWithValue("@BlogId", blgPST.BlogId);
+            cmd.Parameters.AddWithValue("@UpdateTime", blgPST.PostTime ?? DateTime.Now);
 
             cmd.ExecuteNonQuery();
 
@@ -88,6 +89,7 @@ namespace BlogAPI.Controllers
                 Title = dto.title,
                 Content = dto.content,
                 PostTime = DateTime.Now,
+                UpdateTime = updatedTime,
                 BlogId = dto.BlogId ?? 0
             };
         }

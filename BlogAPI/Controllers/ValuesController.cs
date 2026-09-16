@@ -58,7 +58,7 @@ namespace BlogAPI.Controllers
              cmd.Parameters.AddWithValue("@Name", blg.Name);
              cmd.Parameters.AddWithValue("@Email", blg.Email);
              cmd.Parameters.AddWithValue("@Age", blg.Age);
-             cmd.Parameters.AddWithValue("@Password", blg.Password);
+             cmd.Parameters.AddWithValue("@Password", blg.Password);    
              cmd.Parameters.AddWithValue("@RegistrationTime", blg.RegistrationTime);
 
             cmd.ExecuteNonQuery();
